@@ -1,0 +1,77 @@
+---
+title: "Call length analysis"
+output: html_notebook
+date: 2017-06-08
+---
+
+```{r}
+load("phgp.Rdata")
+require(tidyverse)
+require(userfriendlyscience)
+```
+
+Mean length of calls
+
+```{r}
+phgp.call <- phgp %>%
+  group_by(call.no) %>%
+  summarise(call.length = sum(total.length, na.rm=T), record.inaccurate = max(record.inaccurate), 
+            in. = max(in.)) %>%
+  filter(record.inaccurate == 0)
+
+m.call <- meanConfInt(phgp.call$call.length)
+
+call.diamond <- diamondPlot(data.frame(ci.lo = m.call$output$ci[1],
+                       means = m.call$input$mean,
+                       ci.hi = m.call$output$ci[2]),
+            yLabels= 1, returnLayerOnly = TRUE, fixedSize = .5)
+
+bob <- ggplot(phgp.call, aes(y=1, x=call.length)) +
+  geom_jitter(width = 0, height = .4, colour = "grey") +
+  # coord_flip() +
+  scale_y_discrete("All calls", labels = "") +
+  theme_bw(14)
+
+m.call
+
+bob + call.diamond
+
+
+```
+
+```{r}
+phgp.call <- phgp %>%
+  group_by(call.no) %>%
+  summarise(call.length = sum(total.length, na.rm=T), record.inaccurate = max(record.inaccurate), 
+            in. = max(in.)) %>%
+  filter(record.inaccurate == 0)
+
+summary(phgp.call) 
+
+phgp.call.stat <- phgp.call %>%
+  group_by(in.) %>%
+  summarise(sd =)
+
+ggplot(phgp.call, aes(as.factor(in.), call.length)) +
+  geom_jitter(width = .1, height = 0) +
+  coord_flip() +
+  theme_bw(14)
+
+
+diamondPlot(data.frame(ci.lo = c(-.31, -.16, .23, .37, .58),
+                       es = c(-.18, -.02, .35, .48, .66),
+                       ci.hi = c(-.05, .12, .47, .58, .73)),
+            yLabels=c('Hallucinate', 'Time', 'Memory', 'Health', 'Experience'));
+
+bob <- diamondPlot()
+
+meansDiamondPlot(phgp.call, items = "call.length", labels = "All Calls", 
+                 jitterWidth = 0, jitterHeight = .02,
+                 outputHeight = 4) +
+  scale_x_continuous(name = "Call Length")
+
+bob <- meansDiamondPlot(phgp.grp, items = "call.length", returnLayerOnly = T)
+
+
+```
+

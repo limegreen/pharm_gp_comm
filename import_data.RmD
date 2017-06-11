@@ -1,0 +1,26 @@
+---
+title: "Get pharm GP data"
+output: html_notebook
+date: "2017-06-07"
+---
+
+
+
+```{r, echo = F, message = F}
+require(tidyverse)
+
+phgp <- read.csv("pharm_gp_comm_data.csv") 
+names(phgp) <- tolower(names(phgp))  
+
+#replace NAs in columns with 0s
+phgp <- phgp %>%
+  mutate_at(vars(staff.pharmacist:other.reason), .funs = funs(coalesce(as.numeric(.), 0)))
+
+save(phgp, file = "phgp.RData")
+
+phgp.grp <- phgp %>%
+  group_by(call.no) %>%
+  summarise(call.length = sum(total.length, na.rm=T))
+  
+```
+
